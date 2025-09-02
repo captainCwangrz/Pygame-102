@@ -1,4 +1,6 @@
 import pygame, sys
+from scripts.entities import PhysicsEntity
+from scripts.utils import load_image
 
 class Game:
   def __init__(self):
@@ -7,11 +9,11 @@ class Game:
     pygame.display.set_caption("Ninja Game")
     self.clock = pygame.time.Clock()
 
-    self.img = pygame.image.load('data/images/clouds/cloud_1.png')
-    self.img.set_colorkey((0, 0, 0)) #turn a specific color to transparent
-    self.img_pos = [160, 0]
+    self.assets = {
+      'Player' : load_image('entities/player.png')
+    }
+    self.player = PhysicsEntity(self, 'Player', (50, 50), (8, 15))
     self.movement = [False, False] #up, down
-    self.collision_area = pygame.Rect(160,200,100,100)
 
   def run(self):
     while True:
@@ -23,28 +25,18 @@ class Game:
           pygame.quit()
           sys.exit()
         if event.type == pygame.KEYDOWN:
-          if event.key == pygame.K_UP:
+          if event.key == pygame.K_LEFT:
             self.movement[0] = True
-          if event.key == pygame.K_DOWN:
+          if event.key == pygame.K_RIGHT:
             self.movement[1] = True
         if event.type == pygame.KEYUP:
-          if event.key == pygame.K_UP:
+          if event.key == pygame.K_LEFT:
             self.movement[0] = False
-          if event.key == pygame.K_DOWN:
+          if event.key == pygame.K_RIGHT:
             self.movement[1] = False
 
-      
-      self.img_pos[1] += (self.movement[1] - self.movement[0]) * 2
-      img_rect = self.img.get_rect(topleft = self.img_pos)
-      
-      if (img_rect.colliderect(self.collision_area)):
-        pygame.draw.rect(self.screen, (255, 0 ,0), self.collision_area)
-      else:
-        pygame.draw.rect(self.screen, (0, 255, 0 ), self.collision_area)
-      
-      
-      self.screen.blit(self.img, self.img_pos)
-      pygame.draw.rect(self.screen, (0, 0, 255), img_rect, 2)
+      self.player.update((self.movement[1] - self.movement[0], 0))
+      self.player.render(self.screen)
 
       pygame.display.flip() #safe full-page refresh, otherwise use update([rect_list])
 
