@@ -2,6 +2,7 @@ import pygame, sys
 from scripts.entities import PhysicsEntity
 from scripts.utils import load_image, load_images
 from scripts.tilemap import Tilemap
+from scripts.clouds import Clouds
 
 class Game:
   def __init__(self):
@@ -17,19 +18,28 @@ class Game:
       'Grass' : load_images('tiles/grass'),
       'Large Decor' : load_images('tiles/large_decor'),
       'Stone' : load_images('tiles/stone'),
-      'Background' : load_image('background.png')
+      'Background' : load_image('background.png'),
+      'Clouds' : load_images('clouds')
     }
+
     self.player = PhysicsEntity(self, 'Player', (50, 50), (8, 15))
     self.movement = [False, False] #up, down
+    self.scroll = [0, 0] 
 
     self.tilemap = Tilemap(self)
-
-    self.scroll = [0, 0] 
+    self.clouds = Clouds(self.assets['Clouds'], count = 16)
 
   def run(self):
     while True:
       self.clock.tick(60)
+
+      self.scroll[0] += (self.player.rect().centerx - self.display.get_width() // 2 - self.scroll[0]) / 30
+      self.scroll[1] += (self.player.rect().centery - self.display.get_height() // 2 - self.scroll[1]) / 30
+      render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
+
       self.display.blit(self.assets['Background'], (0, 0))
+      self.clouds.update()
+      self.clouds.render(self.display, offset = render_scroll)
 
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -48,10 +58,7 @@ class Game:
           if event.key == pygame.K_RIGHT:
             self.movement[1] = False
 
-      self.scroll[0] += (self.player.rect().centerx - self.display.get_width() // 2 - self.scroll[0]) * 0.1
-      self.scroll[1] += (self.player.rect().centery - self.display.get_height() // 2 - self.scroll[1]) * 0.1
-      render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
-      print(render_scroll)
+  
       self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
       self.player.render(self.display, offset = render_scroll)
       self.tilemap.render(self.display, offset = render_scroll)
