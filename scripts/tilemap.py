@@ -31,14 +31,14 @@ class Tilemap:
         rects.append(pygame.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size))
     return rects
 
-  def render(self, surf):
+  def render(self, surf, offset = (0, 0)):
     # Render offgrid stuff first because they are usually bg decors
     for tile in self.offgrid_tiles: 
-      surf.blit(self.game.assets[tile['type']][tile['variant']], tile['pos']) #no * tile_size cuz...off grid?
+      surf.blit(self.game.assets[tile['type']][tile['variant']], (tile['pos'][0] - offset[0], tile['pos'][1] - offset[1])) #no * tile_size cuz...off grid?
     
     for tile in self.tilemap.values():
       loc = tile['pos']
       image = self.game.assets[tile['type']][tile['variant']]
-      surf.blit(image, (loc[0] * self.tile_size, loc[1] * self.tile_size))
+      surf.blit(image, (loc[0] * self.tile_size - offset[0], loc[1] * self.tile_size - offset[1]))
       
   
