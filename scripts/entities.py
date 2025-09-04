@@ -41,11 +41,11 @@ class PhysicsEntity:
         self.pos[1] = entity_rect.y
     
     if self.collisions['UP'] or self.collisions['DOWN']:
-      self.velocity[1] = 0
+      self.velocity[1] = 0 # resets velocity when you hit a wall vertically
     
     #gravity with terminal v
     self.velocity[1] = min(5, self.velocity[1] + 0.1)
 
-  def render(self, surf):
-    surf.blit(self.game.assets[self.type], self.pos)
+  def render(self, surf, offset = (0, 0)):
+    surf.blit(self.game.assets[self.type], (self.pos[0] - offset[0], self.pos[1] - offset[1]))
   
