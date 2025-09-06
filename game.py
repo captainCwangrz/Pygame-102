@@ -28,7 +28,7 @@ class Game:
     }
 
     self.player = Player(self, (50, 50), (8, 15))
-    self.movement = [False, False] #up, down
+    self.movement = [False, False] #left, right
     self.scroll = [0, 0] 
 
     self.tilemap = Tilemap(self)
