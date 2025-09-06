@@ -20,8 +20,8 @@ class Game:
       'Stone' : load_images('tiles/stone'),
       'Background' : load_image('background.png'),
       'Clouds' : load_images('clouds'),
-      'Player/idle' : Animation(load_images('entities/player/idle'),frame_duration = 6),
-      'Player/run' : Animation(load_images('entities/player/run'),frame_duration = 4),
+      'Player/idle' : Animation(load_images('entities/player/idle'), frame_duration = 6),
+      'Player/run' : Animation(load_images('entities/player/run'), frame_duration = 4),
       'Player/jump' : Animation(load_images('entities/player/jump')),
       'Player/slide' : Animation(load_images('entities/player/slide')),
       'Player/wall_slide' : Animation(load_images('entities/player/wall_slide'))
@@ -32,6 +32,7 @@ class Game:
     self.scroll = [0, 0] 
 
     self.tilemap = Tilemap(self)
+    self.tilemap.load('map.json')
     self.clouds = Clouds(self.assets['Clouds'], count = 16)
 
   def run(self):
