@@ -71,12 +71,8 @@ class Editor:
           tile_rect = pygame.Rect(off_tile['pos'][0] - self.scroll[0], off_tile['pos'][1] - self.scroll[1], tile_img.get_width(), tile_img.get_height())
           if tile_rect.collidepoint(mpos):
             self.tilemap.offgrid_tiles.remove(off_tile)
-          
-          
-      
 
       self.display.blit(current_tile_img, (5, 5))
-
 
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
