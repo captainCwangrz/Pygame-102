@@ -1,8 +1,9 @@
-import pygame, sys
+import pygame, sys, random, math
 from scripts.entities import PhysicsEntity, Player
 from scripts.utils import load_image, load_images, Animation
 from scripts.tilemap import Tilemap
 from scripts.clouds import Clouds
+from scripts.particle import Particle
 
 class Game:
   def __init__(self):
@@ -24,7 +25,8 @@ class Game:
       'Player/run' : Animation(load_images('entities/player/run'), frame_duration = 4),
       'Player/jump' : Animation(load_images('entities/player/jump')),
       'Player/slide' : Animation(load_images('entities/player/slide')),
-      'Player/wall_slide' : Animation(load_images('entities/player/wall_slide'))
+      'Player/wall_slide' : Animation(load_images('entities/player/wall_slide')),
+      'Particle/leaf' : Animation(load_images('particles/leaf'), frame_duration = 20, loop = False)
     }
 
     self.player = Player(self, (50, 50), (8, 15))
@@ -33,6 +35,11 @@ class Game:
 
     self.tilemap = Tilemap(self)
     self.tilemap.load('map.json')
+    self.leaf_spawners = []
+    for tree in self.tilemap.extract_particles([('Large Decor', 2)], keep = True):
+      self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 23, 13))
+    self.particles = []
+
     self.clouds = Clouds(self.assets['Clouds'], count = 16)
 
   def run(self):
@@ -42,6 +49,11 @@ class Game:
       self.scroll[0] += (self.player.rect().centerx - self.display.get_width() // 2 - self.scroll[0]) / 30
       self.scroll[1] += (self.player.rect().centery - self.display.get_height() // 2 - self.scroll[1]) / 30
       render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
+
+      for rect in self.leaf_spawners:
+        if random.random() * 49999 < rect.width * rect.height:
+          pos = (rect.x + random.random() * rect.width, rect.y + random.random() * rect.height)
+          self.particles.append(Particle(self, 'leaf', pos, [-0.1, 0.3], random.randint(0, 20)))
 
       self.display.blit(self.assets['Background'], (0, 0))
       self.clouds.update()
@@ -68,6 +80,15 @@ class Game:
       self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
       self.player.render(self.display, offset = render_scroll)
       self.tilemap.render(self.display, offset = render_scroll)
+      for particle in self.particles.copy():
+        kill = particle.update()
+        particle.render(self.display, offset = render_scroll)
+        if particle.type == 'leaf':
+          print('here')
+          particle.pos[0] += math.sin(particle.animation.frame * 0.035) * 0.3
+        if kill:
+          self.particles.remove(particle)
+
       self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
 
       pygame.display.flip() #safe full-page refresh, otherwise use update([rect_list])
